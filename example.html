@@ -9,11 +9,14 @@
 <body ng-app="myApp" ng-controller="indexCtrl">
     <!--------------------------------------- html ----------------------------------------------------->
     <!--分页directive-->
-    <pagination page="page" max-page="maxPage" ng-click="pageTo()"></pagination>
+    <pagination page="page" max-page="maxPage" show-list-length = "showListLength" ng-click="pageTo()"></pagination>
     <!--显示文本框-->
     <p>当前页数：{{showPage}}</p>
-    <p>总页数：
-        <input type="text" ng-model="showMaxPage" ng-change="resetMaxPage()" title="显示的页码"/>
+    <p>窗口大小（重置后需要点击页码才可刷新）:
+        <input type="text" ng-model="showListLength" title="窗口大小"/>
+    </p>
+    <p>总页数（重置后直接刷新）：
+        <input type="text" ng-model="showMaxPage" ng-change="resetPage()" title="显示的页码"/>
     </p>
 
     <!--------------------------------------- js ----------------------------------------------------->
@@ -26,6 +29,7 @@
             $scope.showPage = 1;    //显示页数当前为1
             $scope.maxPage = 12;    //初始化总页数为12
             $scope.showMaxPage = 12;
+            $scope.showListLength = 7;
 
             /*--- 绑定函数 ---*/
             /*  显示当前页码
@@ -35,7 +39,7 @@
             };
             /*  改变最大页数
             * */
-            $scope.resetMaxPage = function () {
+            $scope.resetPage = function () {
                 $scope.page = 1;    //初始页复位
                 $scope.maxPage = $scope.showMaxPage;
             };

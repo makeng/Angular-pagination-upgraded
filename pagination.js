@@ -1,5 +1,5 @@
 /**
- * Created by ken on 2017/4/23.
+ * Created by ken on 201showListLength/4/23.
  */
 /*  分页指令
 *   对外暴露的有两个参数，一个是当前页page，一个是最大页数maxPage
@@ -12,7 +12,8 @@ app.directive('pagination', function() {
         //作用域
         scope:{
             page: '=',  //等号是双向绑定
-            maxPage: '='
+            maxPage: '=',
+            showListLength: '='
         },
         //html
         template:
@@ -38,7 +39,7 @@ app.directive('pagination', function() {
             //变量
             var pageList = [];
             $scope.page = 1;    //初始默认为第一页
-            $scope.pageShowList = [];    //最大显示7个格子
+            $scope.pageShowList = [];    //最大显示showListLength个格子
 
             /*  监听最大页数，如果页数变化，重新生成页数数组
             * */
@@ -80,24 +81,30 @@ app.directive('pagination', function() {
              * */
             function resetPageOrder(num) {
                 $scope.clickPage = num; //变色
-                if (num > 4 ) {
-                    $scope.pageShowList = [
-                        num - 3,
-                        num - 2,
-                        num - 1,
-                        num,
-                        num + 1,
-                        num + 2,
-                        num + 3
-                    ];
-                    if ( num > $scope.maxPage - 3 ){    //去除多出的页数
-                        for ( var i = 0; i < 3-($scope.maxPage - num); i ++ ){
-                            $scope.pageShowList.pop();
+                var halfShowListLength = Math.ceil($scope.showListLength / 2);
+                //分三种情况讨论
+                //第一种是窗口在头，且页码在窗口左半边，不移动
+                if (num < halfShowListLength ){
+                    $scope.pageShowList = pageList.slice(0, $scope.showListLength);  //只显示最大showListLength个
+                }
+                //页码大于一半开始跟随移动
+                else
+                {
+                    //第二种是窗口在尾，且页码在窗口右半边
+                    if(num > $scope.maxPage - halfShowListLength ){
+                        $scope.pageShowList = pageList.slice($scope.maxPage-$scope.showListLength, $scope.maxPage);  //只显示最大showListLength个
+                    }
+                    //第三种是窗口在头尾各去掉一半的中间移动
+                    else{
+                        $scope.pageShowList = [];
+                        for (var i = 1; i <= $scope.showListLength; i ++ ){
+                            $scope.pageShowList.push(
+                                num - halfShowListLength + i
+                            )
                         }
                     }
-                } else{  //点击小于4的页数
-                    $scope.pageShowList = pageList.slice(0, 7);  //只显示最大7个
-                }
+                } 
+                //小于一半不移动
             }
         }
     }
