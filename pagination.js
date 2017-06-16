@@ -23,7 +23,7 @@ app.directive('pagination', function() {
                     '<li><a href="javascript:void(0)" ng-click="pagePre()">上一页</a></li>' +
                 '</ul>' +
                 '<ul>' +
-                    '<li ng-repeat="num in pageShowList" ng-class="{active: clickPage == num}">' +
+                    '<li ng-repeat="num in pageShowList track by $index" ng-class="{active: clickPage == num}">' +
                     '<a href="javascript:void(0)" ng-click="pageGo(num)">{{num}}</a>' +
                     '</li>' +
                 '</ul>' +
@@ -80,6 +80,7 @@ app.directive('pagination', function() {
             *   @param num当前页码
              * */
             function resetPageOrder(num) {
+                if ( num === '...' )return;
                 $scope.clickPage = num; //变色
                 var halfShowListLength = Math.ceil($scope.showListLength / 2);
                 //分三种情况讨论
@@ -87,7 +88,7 @@ app.directive('pagination', function() {
                 if (num < halfShowListLength ){
                     $scope.pageShowList = pageList.slice(0, $scope.showListLength);  //只显示最大showListLength个
                 }
-                //页码大于一半开始跟随移动
+                //页码大于一半窗口开始跟随移动
                 else
                 {
                     //第二种是窗口在尾，且页码在窗口右半边
@@ -103,8 +104,18 @@ app.directive('pagination', function() {
                             )
                         }
                     }
-                } 
-                //小于一半不移动
+                }
+                /*---增加省略号---*/
+                //总页数大于窗口大小
+                if( $scope.maxPage > $scope.pageShowList.length ){
+                    if ($scope.page < ($scope.maxPage - halfShowListLength-2)){
+                        $scope.pageShowList = $scope.pageShowList.concat(['...', $scope.maxPage - 1, $scope.maxPage]);
+                        console.log( $scope.pageShowList );
+                    }
+                    if ($scope.page > halfShowListLength + 3 ){
+                        $scope.pageShowList = [1, 2, '...'].concat($scope.pageShowList);
+                    }
+                }
             }
         }
     }
